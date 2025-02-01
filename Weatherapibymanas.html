@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive Weather App</title>
+  <link rel="icon" type="image/x-icon" href="https://3.bp.blogspot.com/-py5FbTZgvjo/YDi1bsQq16I/AAAAAAAACB0/BxejbJBcHA4AVfkB33WYC3YlVmxElM7BwCK4BGAYYCw/s1600/Varanasi%2BSoftware%2BJunction%2BPhone%2BLogo.png">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: #ffffff;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      max-width: 500px;
+      padding: 30px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 15px;
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+      transition: all 0.4s ease-in-out;
+    }
+    .container:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+    }
+    h1 {
+      font-size: 42px;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 15px rgba(255, 255, 255, 0.9);
+    }
+    input {
+      width: 85%;
+      padding: 12px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: none;
+      text-align: center;
+      transition: 0.3s;
+    }
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 12px #ffcc00;
+    }
+    button {
+      padding: 12px 25px;
+      border-radius: 8px;
+      font-size: 18px;
+      background: linear-gradient(45deg, #ffcc00, #ff6600);
+      color: #000;
+      border: none;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: 0.3s;
+      box-shadow: 0 0 15px rgba(255, 204, 0, 0.7);
+    }
+    button:hover {
+      background: #ffffff;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.9);
+    }
+    #info {
+      margin-top: 20px;
+      font-size: 22px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease-in-out;
+    }
+    .show-info {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
+    .loading {
+      font-size: 20px;
+      font-weight: bold;
+      color: #ffcc00;
+      margin-top: 20px;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Weather App</h1>
+    <input id="cityname" type="text" placeholder="Enter city name">
+    <button onclick="getInfo()">Get Info</button>
+    <div id="info"></div>
+    <div id="loading" class="loading" style="display: none;">Fetching data...</div>
+  </div>
+  <script>
+    function getInfo() {
+      const cityname = document.getElementById("cityname").value;
+      const infoDiv = document.getElementById("info");
+      const loadingDiv = document.getElementById("loading");
+      infoDiv.innerHTML = "";
+      infoDiv.classList.remove("show-info");
+      if (!cityname) {
+        infoDiv.innerHTML = "<p>Please enter a city name.</p>";
+        infoDiv.classList.add("show-info");
+        return;
+      }
+      loadingDiv.style.display = "block";
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityname}&appid=4a1f8a61b74546825af1e0be106e797b&units=metric`;
+      fetch(url)
+        .then(response => response.ok ? response.json() : Promise.reject("City not found"))
+        .then(data => {
+          const icon = data.weather[0].icon;
+          const imgPath = `https://openweathermap.org/img/w/${icon}.png`;
+          infoDiv.innerHTML = `
+            <img src="${imgPath}" alt="Weather Icon">
+            <ul>
+              <li><strong>Weather:</strong> ${data.weather[0].main}</li>
+              <li><strong>Temperature:</strong> ${data.main.temp}°C</li>
+              <li><strong>Feels Like:</strong> ${data.main.feels_like}°C</li>
+              <li><strong>Humidity:</strong> ${data.main.humidity}%</li>
+            </ul>`;
+          infoDiv.classList.add("show-info");
+        })
+        .catch(error => {
+          infoDiv.innerHTML = `<p>${error}. Please try again.</p>`;
+          infoDiv.classList.add("show-info");
+        })
+        .finally(() => loadingDiv.style.display = "none");
+    }
+  </script>
+</body>
+</html>
